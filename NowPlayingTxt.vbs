@@ -14,14 +14,14 @@ Sub OnStartup ()
 End Sub
 
 Sub ClearTrackInfo ()
-    WriteTrackInfo "", "", ""
+    WriteTrackInfo "", "", "", ""
 End Sub
 
 Sub UpdateTrackInfo ()
-    Dim strTrack, strArtist, strAlbum
+    Dim strTrack, strArtist, strAlbum, strSite
 
     If (SDB.Player.isPaused OR IsEmpty(SDB.Player.CurrentSong)) Then
-        WriteTrackInfo "", "", ""
+        WriteTrackInfo "", "", "", ""
     Else
         strTrack = SDB.Player.CurrentSong.Title
 
@@ -37,11 +37,17 @@ Sub UpdateTrackInfo ()
             strAlbum = SDB.Player.CurrentSong.Album.Name
         End If
 
-        WriteTrackInfo strTrack, strArtist, strAlbum
+        If (IsEmpty(SDB.Player.CurrentSong.Custom1)) Then
+            strSite = ""
+        Else
+            strSite = SDB.Player.CurrentSong.Custom1
+        End If
+
+        WriteTrackInfo strTrack, strArtist, strAlbum, strSite
     End If
 End Sub
 
-Sub WriteTrackInfo (strTrack, strArtist, strAlbum)
+Sub WriteTrackInfo (strTrack, strArtist, strAlbum, strSite)
 
     Dim objStream
 
@@ -58,6 +64,12 @@ Sub WriteTrackInfo (strTrack, strArtist, strAlbum)
     End If
 
     objStream.WriteText strTrack
+
+    If (strSite <> "") Then
+        objStream.WriteText " (" & strSite & ")"
+    End If
+
+    objStream.WriteText "                                               "
 
     objStream.saveToFile strTextFilePath,2
 End Sub
